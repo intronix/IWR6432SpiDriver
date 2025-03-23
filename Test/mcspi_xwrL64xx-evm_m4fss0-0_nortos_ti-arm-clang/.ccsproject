@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?ccsproject version="1.0"?>
+<projectOptions>
+	<ccsVariant value="50:Theia-based"/>
+	<ccsVersion value="70.1.0"/>
+	<deviceFamily value="TMS470"/>
+	<connection value="common/targetdb/connections/TIXDS110_Connection.xml"/>
+	<executableActions value=""/>
+	<createSlaveProjects value=""/>
+	<ignoreDefaultDeviceSettings value="true"/>
+	<ignoreDefaultCCSSettings value="true"/>
+	<activeTargetConfiguration value="targetConfigs/IWRL6432.ccxml"/>
+	<templateProperties value="id=example.projectspec.mcspi_loopback_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang"/>
+	<isTargetConfigurationManual value="false"/>
+	<origin value="C:\ti\MMWAVE_L_SDK_05_04_00_01\examples\drivers\mcspi\mcspi_loopback\xwrL64xx-evm\m4fss0-0_nortos\ti-arm-clang\example.projectspec"/>
+	<filesToOpen value=""/>
+</projectOptions>
