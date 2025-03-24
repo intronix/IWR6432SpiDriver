@@ -12,6 +12,7 @@ void setup()
     SPI.begin();
     SPI.setFrequency(100000); // Set SPI clock to 100 kHz
     SPI.setHwCs(false);
+    delay(5000);
     pinMode(CS, OUTPUT);
     digitalWrite(CS, HIGH);
 }
