@@ -19,10 +19,11 @@ const mpu_armv73 = mpu_armv7.addInstance();
 /**
  * Write custom configuration values to the imported modules.
  */
-mcspi1.$name                 = "CONFIG_MCSPI0";
-mcspi1.intrEnable            = "POLLED";
-mcspi1.MCSPI.$assign         = "MCSPIA";
-mcspi1.mcspiChannel[0].$name = "CONFIG_MCSPI_CH0";
+mcspi1.$name                   = "CONFIG_MCSPI0";
+mcspi1.intrEnable              = "POLLED";
+mcspi1.MCSPI.$assign           = "MCSPIA";
+mcspi1.mcspiChannel[0].$name   = "CONFIG_MCSPI_CH0";
+mcspi1.mcspiChannel[0].bitRate = 100000;
 
 debug_log.enableUartLog           = true;
 debug_log.uartLog.$name           = "CONFIG_UART0";

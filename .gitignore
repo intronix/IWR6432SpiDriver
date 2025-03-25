@@ -1,2 +1,7 @@
 Test/mcspi_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang/.settings/*
 Test/mcspi_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang/Debug/*
+Test/mcspi_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang/Release/*
+.gitignore
+Test/mcspi_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang/.clangd
+Test/mcspi_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang/example.syscfg
+Test/mcspi_xwrL64xx-evm_m4fss0-0_nortos_ti-arm-clang/mcspi_loopback.c

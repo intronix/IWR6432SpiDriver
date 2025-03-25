@@ -7,11 +7,13 @@
 #include "ti_drivers_open_close.h"
 #include "ti_board_open_close.h"
 
-#define APP_MCSPI_MSGSIZE (8)
-#define APP_MCSPI_TRANSFER_LOOPCOUNT (10U)
+#define APP_MCSPI_MSGSIZE (1) // Single byte transfer
 
 uint8_t gMcspiTxBuffer[APP_MCSPI_MSGSIZE];
 uint8_t gMcspiRxBuffer[APP_MCSPI_MSGSIZE];
+
+#define CMD_BYTE 0x04   // Command byte to send
+#define DUMMY_BYTE 0xFF // Dummy byte for reading response
 
 /* Function for communication with ESP32 */
 void *mcspi_transfer_main(void *args)
@@ -34,7 +36,7 @@ void *mcspi_transfer_main(void *args)
     MCSPI_Transaction_init(&spiTransaction);
     spiTransaction.channel = gConfigMcspi0ChCfg[0].chNum;
     spiTransaction.dataSize = 8;     // ESP32 uses 8-bit
-    spiTransaction.csDisable = TRUE;  // De-assert CS after transfer (proper framing)
+    spiTransaction.csDisable = TRUE; // De-assert CS after transfer (proper framing)
     spiTransaction.count = APP_MCSPI_MSGSIZE;
     spiTransaction.txBuf = (void *)gMcspiTxBuffer;
     spiTransaction.rxBuf = (void *)gMcspiRxBuffer;
@@ -51,51 +53,35 @@ void *mcspi_transfer_main(void *args)
     uint32_t transferCount = 0;
     while (1)
     {
-        /* Initialize TX buffer with incrementing pattern */
-        for (i = 0U; i < APP_MCSPI_MSGSIZE; i++)
-        {
-            // Use a predictable pattern that ESP32 can validate
-            gMcspiTxBuffer[i] = i + transferCount;
-            gMcspiRxBuffer[i] = 0U;
-        }
+        /* Send command byte */
+        gMcspiTxBuffer[0] = CMD_BYTE;
+        gMcspiRxBuffer[0] = 0U;
 
-        /* Add delay between transfers to give ESP32 time to process */
-        ClockP_usleep(5000);  // 5ms gap before transfer
-
-        /* Perform transfer */
+        /* Perform command transfer */
         startTimeInUSec = ClockP_getTimeUsec();
+        transferOK = MCSPI_transfer(gMcspiHandle[CONFIG_MCSPI0], &spiTransaction);
+
+        /* Wait for slave processing - 100 microseconds like Arduino code */
+        ClockP_usleep(100);
+
+        /* Read response using dummy byte */
+        gMcspiTxBuffer[0] = DUMMY_BYTE;
+        gMcspiRxBuffer[0] = 0U;
+
         transferOK = MCSPI_transfer(gMcspiHandle[CONFIG_MCSPI0], &spiTransaction);
         elapsedTimeInUsecs = ClockP_getTimeUsec() - startTimeInUSec;
 
         /* Print transfer results */
         DebugP_log("\r\n----------------------------------------------------------\r\n");
-        DebugP_log("Transfer #%d Status: %s\r\n", 
-                  transferCount, 
-                  (transferOK == SystemP_SUCCESS) ? "Success" : "Failed");
+        DebugP_log("Transfer #%d Status: %s\r\n",
+                   transferCount,
+                   (transferOK == SystemP_SUCCESS) ? "Success" : "Failed");
         DebugP_log("Transfer Time: %llu us\r\n", elapsedTimeInUsecs);
-
-        /* Print TX data */
-        DebugP_log("TX Data: ");
-        for (i = 0; i < APP_MCSPI_MSGSIZE; i++)
-        {
-            DebugP_log("0x%02X ", gMcspiTxBuffer[i]);
-        }
-        DebugP_log("\r\n");
-
-        /* Print RX data */
-        if (transferOK == SystemP_SUCCESS)
-        {
-            DebugP_log("RX Data: ");
-            for (i = 0; i < APP_MCSPI_MSGSIZE; i++)
-            {
-                DebugP_log("0x%02X ", gMcspiRxBuffer[i]);
-            }
-            DebugP_log("\r\n");
-        }
+        DebugP_log("Sent: 0x%02X, Received: 0x%02X\r\n", CMD_BYTE, gMcspiRxBuffer[0]);
 
         transferCount++;
-        /* Wait between transfers */
-        ClockP_usleep(500000);  // 500ms between transfers
+        /* Wait between transfers - 1 second like Arduino code */
+        ClockP_usleep(1000000);
     }
 
     /* Note: This code will never be reached due to infinite loop */
